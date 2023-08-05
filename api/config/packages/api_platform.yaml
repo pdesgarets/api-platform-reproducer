@@ -1,4 +1,5 @@
 api_platform:
+    name_converter: 'Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter'
     title: API Platform's demo
     version: 1.0.0
     description: |
