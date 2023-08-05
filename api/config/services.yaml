@@ -28,3 +28,4 @@ services:
 
     # todo replace by #[AsAlias] attribute (introduced in Symfony 6.3)
     App\Repository\TopBook\TopBookDataInterface: '@App\Repository\TopBook\TopBookDataRepository'
+    'Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter': ~

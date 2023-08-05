@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Ignore;
+use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ApiResource]
 #[ORM\Table(name: '`user`')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -34,6 +38,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'json')]
     private array $roles = [];
+
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: MyEntity::class)]
+    private Collection $myEntities;
+
+    public function __construct()
+    {
+        $this->myEntities = new ArrayCollection();
+    }
 
     public function getId(): ?Uuid
     {
@@ -91,5 +103,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
+    }
+
+    /**
+     * @return Collection<int, MyEntity>
+     */
+    public function getMyEntities(): Collection
+    {
+        return $this->myEntities;
+    }
+
+    public function addMyEntity(MyEntity $myEntity): self
+    {
+        if (!$this->myEntities->contains($myEntity)) {
+            $this->myEntities->add($myEntity);
+            $myEntity->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMyEntity(MyEntity $myEntity): self
+    {
+        if ($this->myEntities->removeElement($myEntity)) {
+            // set the owning side to null (unless already changed)
+            if ($myEntity->getOwner() === $this) {
+                $myEntity->setOwner(null);
+            }
+        }
+
+        return $this;
     }
 }
