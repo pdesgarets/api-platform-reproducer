@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -25,8 +26,17 @@ class Greeting
      * A nice person
      */
     #[ORM\Column]
+    #[ApiProperty(security: 'is_granted("ROLE_ADMIN") || object?.ownerName == user.getUserIdentifier()')]
     #[Assert\NotBlank]
     public string $name = '';
+
+    /**
+     * A nice person
+     */
+    #[ORM\Column]
+    #[ApiProperty(security: 'is_granted("ROLE_ADMIN")')]
+    #[Assert\NotBlank]
+    public string $ownerName = '';
 
     public function getId(): ?int
     {
